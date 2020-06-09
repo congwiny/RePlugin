@@ -97,6 +97,22 @@ public class MainActivity extends Activity {
             }
         });
 
+        findViewById(R.id.btn_start_demo5).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                final ProgressDialog pd = ProgressDialog.show(MainActivity.this, "Installing...", "Please wait...", true, true);
+                // FIXME: 仅用于安装流程演示 2017/7/24
+                new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        simulateInstallExternalPlugin2("utility.apk", "com.qihoo.browser.utility.MainActivity");
+                        pd.dismiss();
+                    }
+                }, 1000);
+            }
+        });
+
         findViewById(R.id.btn_install_apk_from_assets).setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -141,7 +157,7 @@ public class MainActivity extends Activity {
      * 注意：为方便演示，外置插件临时放置到Host的assets/external目录下，具体说明见README</p>
      */
     private void simulateInstallExternalPlugin() {
-        String demo3Apk= "demo3.apk";
+        String demo3Apk = "demo3.apk";
         String demo3apkPath = "external" + File.separator + demo3Apk;
 
         // 文件是否已经存在？直接删除重来
@@ -166,9 +182,39 @@ public class MainActivity extends Activity {
     }
 
     /**
+     * 模拟安装或升级（覆盖安装）外置插件
+     * 注意：为方便演示，外置插件临时放置到Host的assets/external目录下，具体说明见README</p>
+     */
+    private void simulateInstallExternalPlugin2(String apkName, String startActivity) {
+
+        String demo3apkPath = "external" + File.separator + apkName;
+
+        // 文件是否已经存在？直接删除重来
+        String pluginFilePath = getFilesDir().getAbsolutePath() + File.separator + apkName;
+        File pluginFile = new File(pluginFilePath);
+        if (pluginFile.exists()) {
+            FileUtils.deleteQuietly(pluginFile);
+        }
+
+        // 开始复制
+        copyAssetsFileToAppFiles(demo3apkPath, apkName);
+        PluginInfo info = null;
+        if (pluginFile.exists()) {
+            info = RePlugin.install(pluginFilePath);
+        }
+
+        if (info != null) {
+            RePlugin.startActivity(MainActivity.this, RePlugin.createIntent(info.getName(), startActivity));
+        } else {
+            Toast.makeText(MainActivity.this, "install external plugin " + apkName + " failed", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
      * 从assets目录中复制某文件内容
-     *  @param  assetFileName assets目录下的Apk源文件路径
-     *  @param  newFileName 复制到/data/data/package_name/files/目录下文件名
+     *
+     * @param assetFileName assets目录下的Apk源文件路径
+     * @param newFileName   复制到/data/data/package_name/files/目录下文件名
      */
     private void copyAssetsFileToAppFiles(String assetFileName, String newFileName) {
         InputStream is = null;
@@ -180,7 +226,7 @@ public class MainActivity extends Activity {
             fos = this.openFileOutput(newFileName, Context.MODE_PRIVATE);
             int byteCount = 0;
             byte[] buffer = new byte[buffsize];
-            while((byteCount = is.read(buffer)) != -1) {
+            while ((byteCount = is.read(buffer)) != -1) {
                 fos.write(buffer, 0, byteCount);
             }
             fos.flush();
