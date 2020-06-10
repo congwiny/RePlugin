@@ -113,6 +113,38 @@ public class MainActivity extends Activity {
             }
         });
 
+        findViewById(R.id.btn_start_demo6).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                final ProgressDialog pd = ProgressDialog.show(MainActivity.this, "Installing...", "Please wait...", true, true);
+                // FIXME: 仅用于安装流程演示 2017/7/24
+                new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        simulateInstallExternalPlugin2("pdf.apk", "cn.qihoo.pdf.activity.ReadActivity");
+                        pd.dismiss();
+                    }
+                }, 1000);
+            }
+        });
+
+        findViewById(R.id.btn_start_demo7).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                final ProgressDialog pd = ProgressDialog.show(MainActivity.this, "Installing...", "Please wait...", true, true);
+                // FIXME: 仅用于安装流程演示 2017/7/24
+                new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        simulateInstallExternalPlugin2("office.apk", "com.qihoo.browser.activity.MainActivity");
+                        pd.dismiss();
+                    }
+                }, 1000);
+            }
+        });
+
         findViewById(R.id.btn_install_apk_from_assets).setOnClickListener(new View.OnClickListener() {
 
             @Override
